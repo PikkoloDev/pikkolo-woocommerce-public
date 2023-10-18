@@ -1,4 +1,4 @@
-=== Pikkoló - WooCommerce ===
+=== Pikkoló for Woo ===
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: Shipping, WooCommerce, Iceland
@@ -7,7 +7,7 @@ Tested up to: 6.3.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 8.0.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 
 == Installation ==
 
@@ -36,3 +36,7 @@ OR
 = 1.0.0 =
 
 * First version
+
+= 1.0.1 =
+
+* Changes from WP team review 
