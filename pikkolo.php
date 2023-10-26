@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló  
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.0
+Version: 1.0.1
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
