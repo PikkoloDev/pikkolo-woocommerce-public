@@ -7,7 +7,7 @@ Tested up to: 6.3.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 8.0.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 == Installation ==
 
@@ -33,10 +33,12 @@ OR
 
 == Changelog ==
 
-= 1.0.0 =
-
-* First version
+= 1.0.2 =
+* Added logic to extract a delivery date from the checkout form. 
 
 = 1.0.1 =
+* Changes in response to the WP team review 
 
-* Changes from WP team review 
+= 1.0.0 =
+* First version
+
