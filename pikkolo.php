@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.2
+Version: 1.0.3
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -104,7 +104,7 @@ if (
 					$this->id = 'pikkolois'; // Id for your shipping method. Should be unique.
 
 					// TODO: Find out why these strings are not added to .pot file
-					$this->title              = __( 'Pikkoló - Self service station' ); // This can be added as an setting but for this example its forced.
+					$this->title              = __( 'Pikkoló' );  
 					$this->method_title       = __( 'Pikkoló' );  // Title shown in admin.
 					$this->method_description = __( 'Pikkoló provides self-service stations for groceries in your neighbourhood' ); // Description shown in admin
 
@@ -606,7 +606,7 @@ if (
 
 			$pikkolo     = new Pikkolo_Shipping_Method();
 			$environment = $pikkolo->get_env();
-			$vendor_id   = $environment == 'production' ? $pikkolo->vendor_id : $pikkolo->vendor_id_test;
+			$vendor_id   = $environment === 'production' ? $pikkolo->vendor_id : $pikkolo->vendor_id_test;
 
 			$sdk_url = $pikkolo->api_url . '/sdk/pikkolo-sdk.min.js?environment=' . $environment . '&vendorId=' . $vendor_id;
 
@@ -618,7 +618,8 @@ if (
 			wp_enqueue_script(
 				'pikkolo-js',
 				esc_url( plugins_url( 'pikkolo/assets/js/pikkolo.js', __DIR__ ) ),
-				array( 'jquery' )
+				array( 'jquery' ),
+				'1.0.3'
 			);
 
 			$customer = WC()->cart->get_customer();
@@ -658,17 +659,17 @@ if (
 	 * @return void
 	 */
 	function pikkolo_validate_location( array $data, WP_Error $errors ) {
-		// Check if a shipping method is chosen
+		// Check if a shipping method is chosen.
 		$shipping_methods = $data['shipping_method'];
 
-		// If Pikkoló is not the chosen shipping method, return early
+		// If Pikkoló is not the chosen shipping method, return early.
 		if ( ! $shipping_methods || ! in_array( 'pikkolois', $shipping_methods ) ) {
 			return;
 		}
 
-		// Check if necessary cookies are set (indicating a Pikkoló location selection)
+		// Check if necessary cookies are set (indicating a Pikkoló location selection).
 		if ( ! isset( $_COOKIE['pikkolo_station_id'], $_COOKIE['pikkolo_delivery_time_id'] ) ) {
-			// Add an error indicating the need to select a Pikkoló location
+			// Add an error indicating the need to select a Pikkoló location.
 			$errors->add(
 				'shipping',
 				__( 'Please select a location for Pikkoló', 'pikkolois' )
@@ -688,12 +689,16 @@ if (
 		$log     = new WC_Logger();
 
 		$order = wc_get_order( $order_id );
-		if ( $order->get_shipping_method() !== $pikkolo->title ) {
+
+		$found_pikkolo = pikkolois_add_station_name_to_shipping_method_title( $order, $_COOKIE );
+		if ( ! $found_pikkolo ) {
 			// Pikkoló is not the chosen shipping method.
 			return;
 		}
+
 		$products_data = pikkolo_get_products_data( $order );
-		$post_fields   = pikkolo_prepare_post_fields( $order, $products_data );
+
+		$post_fields = pikkolo_prepare_post_fields( $order, $products_data );
 
 		$result = pikkolo_send_order_to_api( $pikkolo, $post_fields, $log );
 
@@ -789,7 +794,7 @@ if (
 		$station_id = sanitize_text_field( $_COOKIE['pikkolo_station_id'] );
 		// $delivery_time_id = sanitize_text_field($_COOKIE['pikkolo_delivery_time_id']);
 
-		// Get delivery date from checkout page if it exists
+		// Get delivery date from checkout page if it exists.
 		$delivery_date_from_checkout = pikkolois_get_delivery_date( WC()->checkout()->get_posted_data() );
 
 		$vendor_order_id = strval( $order->get_id() );
@@ -812,7 +817,7 @@ if (
 		if ( $delivery_date_from_checkout ) {
 			$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_checkout;
 		}
-        return $ret;
+		return $ret;
 	}
 
 	function pikkolo_send_order_to_api( $pikkolo, $post_fields, $log ) {

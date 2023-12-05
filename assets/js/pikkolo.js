@@ -27,6 +27,7 @@ jQuery( function( $ ) {
 
             // Clear cookies if any
             if (Cookies.get('pikkolo_station_id')) { Cookies.remove('pikkolo_station_id'); } 
+            if (Cookies.get('pikkolo_station_name')) { Cookies.remove('pikkolo_station_name'); } 
             if (Cookies.get('pikkolo_delivery_time_id')) { Cookies.remove('pikkolo_delivery_time_id'); }
 
             const currentDate = new Date();
@@ -82,6 +83,7 @@ jQuery( function( $ ) {
         );
         
         Cookies.set('pikkolo_station_id', station.id);
+        Cookies.set('pikkolo_station_name', station.name);
         Cookies.set('pikkolo_delivery_time_id', deliveryTime.id);
     }
 

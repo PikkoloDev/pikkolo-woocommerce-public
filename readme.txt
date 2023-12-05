@@ -7,7 +7,7 @@ Tested up to: 6.3.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 8.0.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 
 == Installation ==
 
@@ -32,6 +32,9 @@ OR
 3. Click the **Save changes** button
 
 == Changelog ==
+
+= 1.0.3 =
+* Added station name to the shipping method title
 
 = 1.0.2 =
 * Added logic to extract a delivery date from the checkout form. 
