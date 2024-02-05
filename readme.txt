@@ -33,6 +33,9 @@ OR
 
 == Changelog ==
 
+= 1.0.4 =
+* More robust handling of the delivery date
+
 = 1.0.3 =
 * Added station name to the shipping method title
 

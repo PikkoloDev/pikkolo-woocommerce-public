@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.3
+Version: 1.0.4
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -104,7 +104,7 @@ if (
 					$this->id = 'pikkolois'; // Id for your shipping method. Should be unique.
 
 					// TODO: Find out why these strings are not added to .pot file
-					$this->title              = __( 'Pikkoló' );  
+					$this->title              = __( 'Pikkoló' );
 					$this->method_title       = __( 'Pikkoló' );  // Title shown in admin.
 					$this->method_description = __( 'Pikkoló provides self-service stations for groceries in your neighbourhood' ); // Description shown in admin
 
@@ -696,7 +696,7 @@ if (
 			return;
 		}
 
-		$products_data = pikkolo_get_products_data( $order );
+		$products_data = pikkolois_get_products_data( $order );
 
 		$post_fields = pikkolo_prepare_post_fields( $order, $products_data );
 
@@ -711,83 +711,6 @@ if (
 		$order->save();
 	}
 	add_action( 'woocommerce_checkout_order_processed', 'pikkolo_process_order', 10, 1 );
-
-	/**
-	 * Gets the necessary data from the order's products.
-	 *
-	 * @param WC_Order $order The order object.
-	 * @return array An array of product data.
-	 */
-	function pikkolo_get_products_data( $order ) {
-		$products = $order->get_items();
-
-		// Initializing variables
-		$refrigerated_count    = 0;
-		$frozen_count          = 0;
-		$age_restriction_value = 0;
-		$itemLinesRefrigerated = array();
-		$itemLinesFrozen       = array();
-
-		foreach ( $products as $product ) {
-			$product_id      = $product->get_product_id();
-			$quantity        = $product->get_quantity();
-			$frozen          = get_post_meta( $product_id, 'pikkolo_frozen', true );
-			$age_restriction = get_post_meta( $product_id, 'pikkolo_age_restriction', true );
-
-			$wc_product = $product->get_product();
-			$weight     = $wc_product ? $wc_product->get_weight() : 0;
-			$dimensions = $wc_product ? $wc_product->get_dimensions() : array();
-
-			if ( $age_restriction !== 'none' && $age_restriction > $age_restriction_value ) {
-				$age_restriction_value = $age_restriction;
-			}
-
-			for ( $i = 0; $i < $quantity; $i++ ) {
-				if ( $frozen == 'true' ) {
-					++$frozen_count;
-					$itemLinesFrozen[] = array(
-						'type'        => 'Frozen',
-						'description' => $product->get_name(),
-						'quantity'    => $quantity,
-						'weight'      => $weight,
-						'dimensions'  => $dimensions,
-					);
-				} else {
-					++$refrigerated_count;
-					$itemLinesRefrigerated[] = array(
-						'type'        => 'Refrigerated',
-						'description' => $product->get_name(),
-						'quantity'    => $quantity,
-						'weight'      => $weight,
-						'dimensions'  => $dimensions,
-					);
-				}
-			}
-		}
-
-		$items = array();
-		if ( $refrigerated_count > 0 && $itemLinesRefrigerated !== array() ) {
-			$items[] = array(
-				'description' => 'WooCommerce Refrigerated items',
-				'type'        => 'Refrigerated',
-				'itemLines'   => $itemLinesRefrigerated,
-			);
-		}
-		if ( $frozen_count > 0 && $itemLinesFrozen !== array() ) {
-			$items[] = array(
-				'description' => 'WooCommerce Frozen items',
-				'type'        => 'Frozen',
-				'itemLines'   => $itemLinesFrozen,
-			);
-		}
-
-		return array(
-			'items'                 => $items,
-			'refrigerated_count'    => $refrigerated_count,
-			'frozen_count'          => $frozen_count,
-			'age_restriction_value' => $age_restriction_value,
-		);
-	}
 
 	function pikkolo_prepare_post_fields( $order, $product_data ) {
 		// Get cookies set in pikkolo.js
