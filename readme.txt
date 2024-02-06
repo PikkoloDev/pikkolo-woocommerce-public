@@ -7,7 +7,7 @@ Tested up to: 6.3.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 8.0.2
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 
 == Installation ==
 
