@@ -3,11 +3,11 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: Shipping, WooCommerce, Iceland
 Requires at least: 5.2
-Tested up to: 6.3.0
+Tested up to: 6.7.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
-WC tested up to: 8.0.2
-Stable tag: 1.0.4
+WC tested up to: 9.4.1
+Stable tag: 1.0.5
 
 == Installation ==
 
@@ -32,6 +32,9 @@ OR
 3. Click the **Save changes** button
 
 == Changelog ==
+
+= 1.0.5 =
+* Documentation updates 
 
 = 1.0.4 =
 * More robust handling of the delivery date

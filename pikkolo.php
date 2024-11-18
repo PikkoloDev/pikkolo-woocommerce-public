@@ -348,7 +348,7 @@ if (
 						// $log->add('pikkolois', 'Checking product ' . $product_id);
 						// $log->add('pikkolois', wc_get_product($product->ID));
 
-						// if meta data is not set
+						// if meta data is not set.
 						if ( ! get_post_meta( $product_id, 'pikkolo_frozen', true ) ) {
 							// $log->add('pikkolois', 'Adding pikkolo_frozen meta data to product ' . $product_id);
 							$meta_key_1   = 'pikkolo_frozen';
@@ -583,7 +583,7 @@ if (
 				return;
 			}
 
-			// Add modal button
+			// Add modal button.
 			printf(
 				'<div class="PikkoloDeliveryMethodAction">
 					<span id="pikkolo_chosen_station"></span><br>
@@ -594,6 +594,7 @@ if (
 			);
 		}
 	}
+	// Note that this uses the classic WooCommerce Checkout, not the new block editor.
 	add_action( 'woocommerce_after_shipping_rate', 'pikkolo_choose_location', 10, 2 );
 
 	/**
