@@ -1,8 +1,9 @@
 <?php
-/*
-** Helper Functions
-*/
-
+/**
+ * Helper Functions
+ *
+ * @package PikkoloWooUtils
+ */
 
 /*
 **========== Direct access not allowed ===========
@@ -10,24 +11,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 
-/**
- * Try to get the delivery date from the billing fields.
- *
- * @param array $billing_fields The billing fields array.
- * @return string
- */
-function pikkolois_get_delivery_date( array $billing_fields ): string {
-	$delivery_date = $billing_fields['billing_delivery_date'];
-	$d_m_y         = DateTime::createFromFormat( 'd#m#Y', $delivery_date );
-	$y_m_d         = DateTime::createFromFormat( 'Y#m#d', $delivery_date );
-	if ( $d_m_y ) {
-		return $d_m_y->format( 'Y-m-d' );
-	}
-	if ( $y_m_d ) {
-		return $y_m_d->format( 'Y-m-d' );
-	}
-	return '';
-}
 
 /**
  * Get the station name from the cookies and add it to the shipping method title.
@@ -79,7 +62,7 @@ function pikkolois_get_products_data( $order ) {
 		$age_restriction = get_post_meta( $product_id, 'pikkolo_age_restriction', true );
 
 		$wc_product = $product->get_product();
-        
+
 		$weight     = $wc_product ? $wc_product->get_weight() : 0;
 		$dimensions = $wc_product ? $wc_product->get_dimensions() : array();
 
@@ -137,4 +120,56 @@ function pikkolois_get_products_data( $order ) {
 		'frozen_count'          => $frozen_count,
 		'age_restriction_value' => $age_restriction_value,
 	);
+}
+
+
+
+/**
+ * Prepares the post fields for sending to the Pikkoló API.
+ *
+ * @param Pikkolo_Shipping_Method $pikkolo The Pikkoló shipping method instance.
+ * @param WC_Order                $order The WooCommerce order object.
+ * @param array                   $product_data The product data array containing items, refrigerated count, frozen count, and age restriction value.
+ * @param WC_Logger               $log The WooCommerce logger instance for debugging.
+ */
+function pikkolo_prepare_post_fields( $pikkolo, $order, $product_data, $log ) {
+	// Get cookies set in pikkolo.js.
+	$station_id = isset( $_COOKIE['pikkolo_station_id'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_id'] ) ) : '';
+
+	// Get delivery date from order meta data if it exists.
+	$delivery_date_from_meta = pikkolois_get_delivery_date_from_order_meta_data( $order );
+
+	// Get delivery date from checkout page if it exists.
+	$delivery_date_from_checkout = pikkolois_get_delivery_date( WC()->checkout()->get_posted_data() );
+
+	if ( 'yes' === ( $pikkolo->debug ) ) {
+		$log->add( 'pikkolois', "Delivery date from meta {$delivery_date_from_meta}" );
+		$log->add( 'pikkolois', "Delivery date from checkout $delivery_date_from_checkout" );
+	}
+
+	$vendor_order_id = strval( $order->get_id() );
+	$customer_phone  = strval( $order->get_billing_phone() );
+	$customer_email  = strval( $order->get_billing_email() );
+	$customer_name   = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+
+	$ret = array(
+		'vendorOrderId'           => $vendor_order_id,
+		'stationId'               => $station_id,
+		'customerPhone'           => $customer_phone,
+		'customerEmail'           => $customer_email,
+		'customerName'            => $customer_name,
+		'isSubscription'          => false,
+		'pickupAuthenticationAge' => intval( $product_data['age_restriction_value'] ) > 0 ? intval( $product_data['age_restriction_value'] ) : 0,
+		'nrOfRefrigeratedItems'   => $product_data['refrigerated_count'],
+		'nrOfFreezerItems'        => $product_data['frozen_count'],
+		'items'                   => $product_data['items'],
+	);
+	if ( $delivery_date_from_meta ) {
+		$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_meta;
+	}
+	if ( $delivery_date_from_checkout ) {
+		$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_checkout;
+	}
+
+	return $ret;
 }

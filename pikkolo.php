@@ -3,18 +3,23 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.4
+Version: 1.0.6
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
 */
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 if ( file_exists( __DIR__ . '/inc/functions.php' ) ) {
 	require_once __DIR__ . '/inc/functions.php';
 }
+
+if ( file_exists( __DIR__ . '/inc/dates.php' ) ) {
+	require_once __DIR__ . '/inc/dates.php';
+}
+
 /**
  * Check if WooCommerce is active
  */
@@ -680,7 +685,7 @@ if (
 	add_action( 'woocommerce_after_checkout_validation', 'pikkolo_validate_location', 10, 2 );
 
 	/**
-	 * Books a Pikkólo slot when a order is processed.
+	 * Books a Pikkoló slot when a order is processed.
 	 *
 	 * @param int $order_id The ID of the processed order.
 	 * @return void
@@ -699,7 +704,7 @@ if (
 
 		$products_data = pikkolois_get_products_data( $order );
 
-		$post_fields = pikkolo_prepare_post_fields( $order, $products_data );
+		$post_fields = pikkolo_prepare_post_fields( $pikkolo, $order, $products_data, $log );
 
 		$result = pikkolo_send_order_to_api( $pikkolo, $post_fields, $log );
 
@@ -712,37 +717,6 @@ if (
 		$order->save();
 	}
 	add_action( 'woocommerce_checkout_order_processed', 'pikkolo_process_order', 10, 1 );
-
-	function pikkolo_prepare_post_fields( $order, $product_data ) {
-		// Get cookies set in pikkolo.js
-		$station_id = sanitize_text_field( $_COOKIE['pikkolo_station_id'] );
-		// $delivery_time_id = sanitize_text_field($_COOKIE['pikkolo_delivery_time_id']);
-
-		// Get delivery date from checkout page if it exists.
-		$delivery_date_from_checkout = pikkolois_get_delivery_date( WC()->checkout()->get_posted_data() );
-
-		$vendor_order_id = strval( $order->get_id() );
-		$customer_phone  = strval( $order->get_billing_phone() );
-		$customer_email  = strval( $order->get_billing_email() );
-		$customer_name   = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
-
-		$ret = array(
-			'vendorOrderId'           => $vendor_order_id,
-			'stationId'               => $station_id,
-			'customerPhone'           => $customer_phone,
-			'customerEmail'           => $customer_email,
-			'customerName'            => $customer_name,
-			'isSubscription'          => false,
-			'pickupAuthenticationAge' => intval( $product_data['age_restriction_value'] ) > 0 ? intval( $product_data['age_restriction_value'] ) : 0,
-			'nrOfRefrigeratedItems'   => $product_data['refrigerated_count'],
-			'nrOfFreezerItems'        => $product_data['frozen_count'],
-			'items'                   => $product_data['items'],
-		);
-		if ( $delivery_date_from_checkout ) {
-			$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_checkout;
-		}
-		return $ret;
-	}
 
 	function pikkolo_send_order_to_api( $pikkolo, $post_fields, $log ) {
 		$process_url = $pikkolo->api_url . '/api/public/v1/orders';
