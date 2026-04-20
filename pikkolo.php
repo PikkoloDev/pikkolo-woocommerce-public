@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.6
+Version: 1.0.7
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -18,6 +18,10 @@ if ( file_exists( __DIR__ . '/inc/functions.php' ) ) {
 
 if ( file_exists( __DIR__ . '/inc/dates.php' ) ) {
 	require_once __DIR__ . '/inc/dates.php';
+}
+
+if ( file_exists( __DIR__ . '/inc/hooks-order.php' ) ) {
+	require_once __DIR__ . '/inc/hooks-order.php';
 }
 
 /**
@@ -684,141 +688,10 @@ if (
 	}
 	add_action( 'woocommerce_after_checkout_validation', 'pikkolo_validate_location', 10, 2 );
 
-	/**
-	 * Books a Pikkoló slot when a order is processed.
-	 *
-	 * @param int $order_id The ID of the processed order.
-	 * @return void
-	 */
-	function pikkolo_process_order( $order_id ) {
-		$pikkolo = new Pikkolo_Shipping_Method();
-		$log     = new WC_Logger();
-
-		$order = wc_get_order( $order_id );
-
-		$found_pikkolo = pikkolois_add_station_name_to_shipping_method_title( $order, $_COOKIE );
-		if ( ! $found_pikkolo ) {
-			// Pikkoló is not the chosen shipping method.
-			return;
-		}
-
-		$products_data = pikkolois_get_products_data( $order );
-
-		$post_fields = pikkolo_prepare_post_fields( $pikkolo, $order, $products_data, $log );
-
-		$result = pikkolo_send_order_to_api( $pikkolo, $post_fields, $log );
-
-		if ( ! $result || $result['httpcode'] >= 300 ) {
-			pikkolo_handle_api_error( $result, $order, $pikkolo, $log );
-		} else {
-			pikkolo_handle_api_success( $result, $order, $pikkolo, $log );
-		}
-
-		$order->save();
-	}
-	add_action( 'woocommerce_checkout_order_processed', 'pikkolo_process_order', 10, 1 );
-
-	function pikkolo_send_order_to_api( $pikkolo, $post_fields, $log ) {
-		$process_url = $pikkolo->api_url . '/api/public/v1/orders';
-		if ( $pikkolo->debug == 'yes' ) {
-			$log->add( 'pikkolois', wp_json_encode( $post_fields ) );
-		}
-
-		$response = wp_remote_post(
-			$process_url,
-			array(
-				'method'  => 'POST',
-				'headers' => array(
-					'X-Api-Key'    => ( $pikkolo->get_env() == 'production' ? $pikkolo->api_key : $pikkolo->api_key_test ),
-					'Content-Type' => 'application/json',
-				),
-				'body'    => wp_json_encode( $post_fields ),
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return array(
-				'json'     => json_decode( '{"error":"' . $response->get_error_message() . '"}' ),
-				'httpcode' => 500, // Generic error code, adjust as necessary
-			);
-		}
-
-		$httpcode = wp_remote_retrieve_response_code( $response );
-		$body     = wp_remote_retrieve_body( $response );
-		if ( $pikkolo->debug == 'yes' ) {
-			$log->add( 'pikkolois', $body );
-		}
-		$json = json_decode( $body );
-
-		return array(
-			'json'     => $json,
-			'httpcode' => $httpcode,
-		);
-	}
-
-	function pikkolo_handle_api_error( $result, $order, $pikkolo, $log ) {
-		$error =
-			"Error when attempting to send order to Pikkoló API. Please contact Pikkoló technical support if in need of assistance.\n
-			Status code: " . $result['httpcode'] . "\n
-			Error message: " . ( empty( $result['json'] ) ? 'No error message' : $result['json']->error );
-
-		$order->update_meta_data( 'pikkolo_process_error', $error ); // To display on admin page
-
-		if ( $pikkolo->debug == 'yes' ) {
-			$log->add( 'pikkolois', $error );
-		}
-
-		pikkolo_send_error_to_logtail( $error, $pikkolo, $log );
-	}
-
-	function pikkolo_handle_api_success( $result, $order, $pikkolo, $log ) {
-		$log->add( 'pikkolois', 'Order ID: ' . $result['json']->data->id );
-		$log->add( 'pikkolois', 'Environment: ' . $pikkolo->get_env() );
-
-		$order->update_meta_data( 'pikkolo_order_id', $result['json']->data->id ); // To be able to cancel
-		$order->update_meta_data( 'pikkolo_environment', $pikkolo->get_env() ); // To prevent cancellation errors if test mode settings are changed after
-
-		if ( $pikkolo->debug == 'yes' ) {
-			$log->add( 'pikkolois', 'Order ' . $result['json']->data->vendorOrderId . ' successfully sent to Pikkoló API with ID ' . $result['json']->data->id );
-		}
-	}
-
-	function pikkolo_send_error_to_logtail( $error, $pikkolo, $log ) {
-		$url = $pikkolo->api_url . '/api/public/v1/log';
-
-		$response = wp_remote_post(
-			$url,
-			array(
-				'method'  => 'POST',
-				'headers' => array(
-					'X-Api-Key'    => ( $pikkolo->get_env() == 'production' ? $pikkolo->api_key : $pikkolo->api_key_test ),
-					'Content-Type' => 'application/json',
-				),
-				'body'    => wp_json_encode(
-					array(
-						'level'   => 'debug',
-						'message' => $error,
-					)
-				),
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			$error_message = $response->get_error_message();
-			$log->add( 'pikkolois', 'Something went wrong when sending information to Pikkoló: ' . $error_message );
-		} else {
-			$httpcode = wp_remote_retrieve_response_code( $response );
-			$body     = wp_remote_retrieve_body( $response ); // Convert to JSON to get the error message
-			$json     = json_decode( $body );
-
-			if ( $httpcode >= 300 ) {
-				$log->add( 'pikkolois', 'Something went wrong when sending information to Pikkoló: ' . $json->error );
-			} else {
-				$log->add( 'pikkolois', 'Error information successfully sent to Pikkoló' );
-			}
-		}
-	}
-
+	// Process order at the pikkolo delivery API.
+	add_action( 'woocommerce_payment_complete', 'pikkolo_process_order', 10, 1 );
+	add_action( 'woocommerce_order_status_processing', 'pikkolo_process_order', 10, 1 );
+	add_action( 'woocommerce_order_status_on-hold', 'pikkolo_process_order', 10, 1 );
 
 	/**
 	 * Adds an success or error message to the admin page depending on if the order was processed succesfully or not in Pikkoló.

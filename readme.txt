@@ -7,7 +7,7 @@ Tested up to: 6.7.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 9.4.1
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 
 == Installation ==
 
@@ -32,6 +32,9 @@ OR
 3. Click the **Save changes** button
 
 == Changelog ==
+
+= 1.0.7 =
+* Fix for incomplete order processing and initialization of station selector 
 
 = 1.0.6 =
 * Enable detection of the delivery date from the order meta data 

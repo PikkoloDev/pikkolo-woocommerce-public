@@ -86,8 +86,7 @@ jQuery( function( $ ) {
         Cookies.set('pikkolo_station_name', station.name);
         Cookies.set('pikkolo_delivery_time_id', deliveryTime.id);
     }
-
-    pikkolo_handler.init;
+    pikkolo_handler.init();
     
     $( document ).on( 'updated_shipping_method', pikkolo_handler.init ); // Updated shipping method
     $( document ).on( 'updated_checkout', pikkolo_handler.init ); // Updated checkout
