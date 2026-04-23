@@ -16,6 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function pikkolo_process_order( $order_id ) {
+	if ( ! class_exists( 'Pikkolo_Shipping_Method' ) && function_exists( 'pikkolo_shipping_method_init' ) ) {
+		pikkolo_shipping_method_init();
+	}
+
 	$pikkolo = new Pikkolo_Shipping_Method();
 	$log     = new WC_Logger();
 
