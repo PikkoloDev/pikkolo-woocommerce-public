@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.8
+Version: 1.0.9
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -597,6 +597,7 @@ if (
 				'<div class="PikkoloDeliveryMethodAction">
 					<span id="pikkolo_chosen_station"></span><br>
 					<button id="pikkolo_choose_another" class="button" aria-label="%s">%s</button>
+					<span id="pikkolo_station_error" style="display:none;color:#cc1818;font-weight:bold;"></span>
 				</div>',
 				esc_attr__( 'Choose a Pikkolo station for delivery', 'pikkolois' ),
 				esc_html__( 'Choose a station', 'pikkolois' )
@@ -629,7 +630,7 @@ if (
 				'pikkolo-js',
 				esc_url( plugins_url( 'pikkolo/assets/js/pikkolo.js', __DIR__ ) ),
 				array( 'jquery' ),
-				'1.0.3'
+				'1.0.8'
 			);
 
 			$customer = WC()->cart->get_customer();
@@ -650,6 +651,7 @@ if (
 						'chooseStation'      => __( 'Choose a station', 'pikkolois' ),
 						'noStationAvailable' => __( 'No station available', 'pikkolois' ),
 						'seeOnMap'           => __( 'See on map', 'pikkolois' ),
+						'mustChooseStation'  => __( 'Please select a Pikkoló station.', 'pikkolois' ),
 					),
 				)
 			);

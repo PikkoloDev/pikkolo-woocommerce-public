@@ -1,174 +1,177 @@
-# Copyright (C) 2023 Pikkoló ehf.
+# Copyright (C) 2026 Pikkoló ehf.
 # This file is distributed under the same license as the Pikkoló plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pikkoló 1.0.0\n"
+"Project-Id-Version: Pikkoló 1.0.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pikkolo\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-08-18T09:32:55+00:00\n"
+"POT-Creation-Date: 2026-05-10T21:24:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.8.1\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: pikkolois\n"
 
 #. Plugin Name of the plugin
+#: pikkolo.php
 msgid "Pikkoló"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: pikkolo.php
 msgid "https://pikkolo.is/"
 msgstr ""
 
 #. Description of the plugin
+#: pikkolo.php
 msgid "Shipping method"
 msgstr ""
 
 #. Author of the plugin
+#: pikkolo.php
 msgid "Pikkoló ehf."
 msgstr ""
 
-#: pikkolo.php:85
+#: pikkolo.php:162
 msgid "Connect to Pikkoló"
 msgstr ""
 
-#: pikkolo.php:87
+#: pikkolo.php:164
 msgid "Enter your API key and vendor ID to connect to Pikkoló"
 msgstr ""
 
-#: pikkolo.php:90
+#: pikkolo.php:167
 msgid "Enable/Disable"
 msgstr ""
 
-#: pikkolo.php:95
+#: pikkolo.php:172
 msgid "Enable"
 msgstr ""
 
-#: pikkolo.php:102
+#: pikkolo.php:179
 msgid "API Key"
 msgstr ""
 
-#: pikkolo.php:107
+#: pikkolo.php:184
 msgid "The API key from api.pikkolo.is"
 msgstr ""
 
-#: pikkolo.php:118
+#: pikkolo.php:195
 msgid "API Key (test)"
 msgstr ""
 
-#: pikkolo.php:123
+#: pikkolo.php:200
 msgid "The API key from api-staging.pikkolo.is"
 msgstr ""
 
-#: pikkolo.php:134
+#: pikkolo.php:211
 msgid "Vendor ID"
 msgstr ""
 
-#: pikkolo.php:139
+#: pikkolo.php:216
 msgid "The vendor ID from api.pikkolo.is"
 msgstr ""
 
-#: pikkolo.php:150
+#: pikkolo.php:227
 msgid "Vendor ID (test)"
 msgstr ""
 
-#: pikkolo.php:155
+#: pikkolo.php:232
 msgid "The vendor ID from api-staging.pikkolo.is"
 msgstr ""
 
-#: pikkolo.php:166
+#: pikkolo.php:243
 msgid "Delivery rate"
 msgstr ""
 
-#: pikkolo.php:168
+#: pikkolo.php:245
 msgid "Enter the delivery rate for Pikkoló"
 msgstr ""
 
-#: pikkolo.php:171
+#: pikkolo.php:248
 msgid "Base rate (ISK)"
 msgstr ""
 
-#: pikkolo.php:176
+#: pikkolo.php:253
 msgid "The base rate displayed to the customer"
 msgstr ""
 
-#: pikkolo.php:187
+#: pikkolo.php:264
 msgid "Minimum for free delivery (ISK)"
 msgstr ""
 
-#: pikkolo.php:192
+#: pikkolo.php:269
 msgid "The minimum order amount for free delivery. Leave blank for no minimum"
 msgstr ""
 
-#: pikkolo.php:203
+#: pikkolo.php:280
 msgid "Debugging & Testing"
 msgstr ""
 
-#: pikkolo.php:205
+#: pikkolo.php:282
 msgid "Options related to debugging and testing the Pikkoló gateway."
 msgstr ""
 
-#: pikkolo.php:208
+#: pikkolo.php:285
 msgid "Debug mode"
 msgstr ""
 
-#: pikkolo.php:213
+#: pikkolo.php:290
 msgid "Enable debugging"
 msgstr ""
 
-#: pikkolo.php:219
+#: pikkolo.php:296
+#, php-format
 msgid "See debugging logs %s."
 msgstr ""
 
-#: pikkolo.php:223
+#: pikkolo.php:300
 msgid "here"
 msgstr ""
 
-#: pikkolo.php:227
+#: pikkolo.php:304
 msgid "Test mode (Staging)"
 msgstr ""
 
-#: pikkolo.php:232
+#: pikkolo.php:309
 msgid "Enable test mode"
 msgstr ""
 
-#: pikkolo.php:236
+#: pikkolo.php:313
 msgid "Do requests against test environment"
 msgstr ""
 
-#: pikkolo.php:525
-msgid ""
-"<span data-tooltip=\"bla\" data-flow=\"top\">\n"
-"\t\t\t\t\t<img src=\""
-msgstr ""
-
-#: pikkolo.php:558
+#: pikkolo.php:602
 msgid "Choose a Pikkolo station for delivery"
 msgstr ""
 
-#: pikkolo.php:559
-#: pikkolo.php:605
+#: pikkolo.php:603
+#: pikkolo.php:651
 msgid "Choose a station"
 msgstr ""
 
-#: pikkolo.php:603
+#: pikkolo.php:649
 msgid "No station chosen"
 msgstr ""
 
-#: pikkolo.php:604
+#: pikkolo.php:650
 msgid "Loading stations"
 msgstr ""
 
-#: pikkolo.php:606
+#: pikkolo.php:652
 msgid "No station available"
 msgstr ""
 
-#: pikkolo.php:607
+#: pikkolo.php:653
 msgid "See on map"
 msgstr ""
 
-#: pikkolo.php:641
+#: pikkolo.php:654
+msgid "Please select a Pikkoló station."
+msgstr ""
+
+#: pikkolo.php:687
 msgid "Please select a location for Pikkoló"
 msgstr ""
