@@ -186,3 +186,37 @@ function pikkolo_report_error( $error, $pikkolo, $log ) {
 		}
 	}
 }
+
+/**
+ * Save Pikkoló checkout data to order metadata.
+ *
+ * @param WC_Order $order The order object.
+ * @param array    $data The posted data.
+ * @return void
+ */
+function pikkolo_save_checkout_data_to_order( $order, $data ) {
+	$shipping_methods = $order->get_shipping_methods();
+	$is_pikkolo       = false;
+	foreach ( $shipping_methods as $shipping_method ) {
+		if ( $shipping_method->get_method_id() === 'pikkolois' ) {
+			$is_pikkolo = true;
+			break;
+		}
+	}
+	$delivery_date_from_checkout = '';
+	if ( is_array( $data ) ) {
+		$delivery_date_from_checkout = pikkolois_get_delivery_date( $data );
+	}
+
+	if ( ! $is_pikkolo ) {
+		return;
+	}
+
+	if ( isset( $_COOKIE['pikkolo_station_id'] ) ) {
+		$order->update_meta_data( 'pikkolo_station_id', sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_id'] ) ) );
+	}
+	if ( isset( $_COOKIE['pikkolo_station_name'] ) ) {
+		$order->update_meta_data( 'pikkolo_station_name', sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_name'] ) ) );
+	}
+	$order->update_meta_data( 'pikkolo_delivery_date_from_checkout', sanitize_text_field( wp_unslash( $delivery_date_from_checkout ) ) );
+}

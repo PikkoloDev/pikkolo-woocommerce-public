@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.9
+Version: 1.0.10
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -689,6 +689,10 @@ if (
 		}
 	}
 	add_action( 'woocommerce_after_checkout_validation', 'pikkolo_validate_location', 10, 2 );
+
+	// Save Pikkoló checkout data to order metadata when order is created.
+    add_action( 'woocommerce_checkout_create_order', 'pikkolo_save_checkout_data_to_order', 10, 2 );
+
 
 	// Process order at the pikkolo delivery API.
 	add_action( 'woocommerce_payment_complete', 'pikkolo_process_order', 10, 1 );

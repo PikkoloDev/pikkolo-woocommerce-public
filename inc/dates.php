@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function pikkolois_get_delivery_date( array $billing_fields ): string {
+	if ( empty( $billing_fields['billing_delivery_date'] ) ) {
+		return '';
+	}
 	$delivery_date = $billing_fields['billing_delivery_date'];
 	$d_m_y         = DateTime::createFromFormat( 'd#m#Y', $delivery_date );
 	$y_m_d         = DateTime::createFromFormat( 'Y#m#d', $delivery_date );

@@ -13,22 +13,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
+ * Gets the station ID from order metadata or falls back to cookies.
+ *
+ * @param WC_Order $order The order object.
+ * @return string The station ID.
+ */
+function pikkolo_get_station_id( $order ) {
+	$station_id = $order->get_meta( 'pikkolo_station_id' );
+	if ( ! $station_id ) {
+		$station_id = isset( $_COOKIE['pikkolo_station_id'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_id'] ) ) : '';
+	}
+	return $station_id;
+}
+
+/**
+ * Gets the station name from order metadata or falls back to cookies.
+ *
+ * @param WC_Order $order The order object.
+ * @return string The station name.
+ */
+function pikkolo_get_station_name( $order ) {
+	$station_name = $order->get_meta( 'pikkolo_station_name' );
+	if ( ! $station_name ) {
+		$station_name = isset( $_COOKIE['pikkolo_station_name'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_name'] ) ) : '';
+	}
+	return $station_name;
+}
+
+/**
  * Get the station name from the cookies and add it to the shipping method title.
  *
  * @param WC_Order $order The order object.
  * @param array    $cookies The cookies array.
  * @return bool
  */
-function pikkolois_add_station_name_to_shipping_method_title( $order, array $cookies ): string {
+function pikkolois_add_station_name_to_shipping_method_title( $order, array $cookies ): bool {
 	$found_pikkolo = false;
 	foreach ( $order->get_shipping_methods() as $shipping_method ) {
 		if ( $shipping_method->get_method_id() === 'pikkolois' ) {
 			$found_pikkolo = true;
 			// Add the station name to the shipping method title.
-			$station_name = '';
-			if ( isset( $_COOKIE['pikkolo_station_name'] ) ) {
-				$station_name = sanitize_text_field( wp_unslash( $cookies['pikkolo_station_name'] ) );
-			}
+			$station_name = pikkolo_get_station_name( $order );
 			$shipping_method->set_method_title( ( 'Pikkoló - ' . $station_name ) );
 		}
 	}
@@ -133,14 +158,13 @@ function pikkolois_get_products_data( $order ) {
  * @param WC_Logger               $log The WooCommerce logger instance for debugging.
  */
 function pikkolo_prepare_post_fields( $pikkolo, $order, $product_data, $log ) {
-	// Get cookies set in pikkolo.js.
-	$station_id = isset( $_COOKIE['pikkolo_station_id'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['pikkolo_station_id'] ) ) : '';
+	$station_id = pikkolo_get_station_id( $order );
 
 	// Get delivery date from order meta data if it exists.
 	$delivery_date_from_meta = pikkolois_get_delivery_date_from_order_meta_data( $order );
 
 	// Get delivery date from checkout page if it exists.
-	$delivery_date_from_checkout = pikkolois_get_delivery_date( WC()->checkout()->get_posted_data() );
+	$delivery_date_from_checkout = $order->get_meta( 'pikkolo_delivery_date_from_checkout' );
 
 	if ( 'yes' === ( $pikkolo->debug ) ) {
 		$log->add( 'pikkolois', "Delivery date from meta {$delivery_date_from_meta}" );
@@ -166,8 +190,7 @@ function pikkolo_prepare_post_fields( $pikkolo, $order, $product_data, $log ) {
 	);
 	if ( $delivery_date_from_meta ) {
 		$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_meta;
-	}
-	if ( $delivery_date_from_checkout ) {
+	} elseif ( $delivery_date_from_checkout ) {
 		$ret['deliveryTimeId'] = $station_id . ':' . $delivery_date_from_checkout;
 	}
 
