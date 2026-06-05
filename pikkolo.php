@@ -3,7 +3,7 @@
 Plugin Name: Pikkoló
 Plugin URI: https://pikkolo.is/
 Description: Shipping method
-Version: 1.0.10
+Version: 1.0.11
 Author: Pikkoló ehf.
 Text Domain: pikkolois
 Domain Path: /languages
@@ -708,6 +708,12 @@ if (
 	 * @return void
 	 */
 	function pikkolo_admin_notifications( $order ) {
+		if ( ! class_exists( 'Pikkolo_Shipping_Method' ) && function_exists( 'pikkolo_shipping_method_init' ) ) {
+			pikkolo_shipping_method_init();
+		}
+		if ( ! class_exists( 'Pikkolo_Shipping_Method' ) ) {
+			return;
+		}
 		$pikkolo = new Pikkolo_Shipping_Method();
 		if (
 			is_admin() &&

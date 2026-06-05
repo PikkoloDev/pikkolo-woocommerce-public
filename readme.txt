@@ -7,7 +7,7 @@ Tested up to: 6.7.0
 Requires PHP: 7.3.5
 WC requires at least: 3.8.1
 WC tested up to: 9.4.1
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 
 == Installation ==
 
@@ -32,6 +32,9 @@ OR
 3. Click the **Save changes** button
 
 == Changelog ==
+
+= 1.0.11 =
+* Check the initialization of the Pikkolo shipping method in the admin interface
 
 = 1.0.10 =
 * Save Pikkoló meta data at checkout
